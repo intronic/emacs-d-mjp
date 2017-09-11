@@ -36,6 +36,26 @@
 (use-package dash)
 (use-package f)
 
+;;; system specific packages
+;; load Linux configuration
+(use-package linux
+  :ensure nil
+  :load-path "lisp/"
+  :if (eq system-type 'gnu/linux))
+
+;; load OS X configurations
+(use-package osx
+  :ensure nil
+  :load-path "lisp/"
+  :if (eq system-type 'darwin))
+
+;; load Windows configurations
+(use-package windows
+  :ensure nil
+  :load-path "lisp/"
+  :if (eq system-type 'windows-nt))
+
+
 ;; 100 MB
 (setq large-file-warning-threshold (* 100 1000 1000))
 
@@ -67,10 +87,35 @@
 ;;(when (memq window-system '(mac ns x))
 ;;  (exec-path-from-shell-initialize))
 
+;; save point in buffer
+(save-place-mode 1)
+
+;; y/n for yes/no
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; save kill ring
+(use-package savekill)
+
+;; fortune
+(setq inhibit-startup-screen t)
+(use-package fortune-cookie
+  :config
+  (setq fortune-cookie-fortune-args " -c "
+	fortune-cookie-cowsay-enable t
+	fortune-cookie-cowsay-args " -f tux -s")
+  (fortune-cookie-mode))
+
 ;; http://www.flycheck.org/
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode))
+
+;; company "complete anything" https://github.com/andschwa/.emacs.d/blob/master/init.el
+(use-package company
+  :diminish company-mode
+  :commands (company-complete company-mode)
+  :init
+  (add-hook 'after-init-hook 'global-company-mode))
 
 ;; https://github.com/jyp/dante
 (use-package dante
@@ -93,7 +138,7 @@
  '(frame-background-mode (quote dark))
  '(package-selected-packages
    (quote
-    (dante flycheck use-package f color-theme-solarized))))
+    (fortune-cookie savekill company dante flycheck use-package f color-theme-solarized))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
