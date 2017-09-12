@@ -1,15 +1,9 @@
+;;; package --- Init script
+;;; Commentary:
+;;; Code:
+
 ;; http://melpa.org/#/getting-started
 (require 'package) ;; You might already have this line
-
-;;(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-;;                    (not (gnutls-available-p))))
-;;       (url (concat (if no-ssl "http" "https") "://melpa.org/packages/")))
-;;  (add-to-list 'package-archives (cons "melpa" url) t))
-;;(when (< emacs-major-version 24)
-;;  ;; For important compatibility libraries like cl-lib
-;;  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
-;;(package-initialize) ;; You might already have this line
-
 
 (setq load-prefer-newer t
       package-enable-at-startup nil
@@ -58,6 +52,8 @@
 
 ;; 100 MB
 (setq large-file-warning-threshold (* 100 1000 1000))
+
+(desktop-save-mode 1)
 
 ;; recent files
 (setq recentf-max-saved-items 256
@@ -130,6 +126,19 @@
 ;; (add-hook 'dante-mode-hook
 ;;    '(lambda () (flycheck-add-next-checker 'haskell-dante
 ;;                 '(warning . haskell-hlint))))
+
+
+;; https://github.com/chrisdone/structured-haskell-mode
+;; 1. go to elisp dir in the git repo, and 'make all'
+;; 2. install haskell binaries with nix:
+;; nix-env -f "<nixpkgs>" -i -A haskellPackages.structured-haskell-mode/src/structured-haskell-mode/elisp
+;; nix-env -f "<nixpkgs>" -i -A haskellPackages.hindent
+(use-package shm
+  :after haskell-mode
+  :load-path "../src/structured-haskell-mode/elisp/"
+  :init
+  (add-hook 'haskell-mode-hook 'structured-haskell-mode))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -145,3 +154,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(provide 'init)
+;;; init.el ends here
