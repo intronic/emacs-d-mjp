@@ -113,6 +113,9 @@
   :init
   (add-hook 'after-init-hook 'global-company-mode))
 
+;; skip dante, use intero, but use intero inside nix:-
+;; https://github.com/NixOS/nixpkgs/issues/21495
+
 ;; https://github.com/jyp/dante
 (use-package dante
   :ensure t
