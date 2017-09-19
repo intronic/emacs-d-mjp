@@ -26,6 +26,21 @@
 (eval-when-compile
   (require 'use-package))
 
+;; 100 MB
+(setq large-file-warning-threshold (* 100 1000 1000))
+
+(desktop-save-mode 1)
+(set-face-font 'default "Hack-11")
+
+;; set auto revert of buffers if file is changed externally
+(global-auto-revert-mode)
+
+
+;; recent files
+(setq recentf-max-saved-items 256
+      recentf-max-menu-items 16)
+(recentf-mode)
+
 ;; packages used in init
 (use-package dash)
 (use-package f)
@@ -49,35 +64,21 @@
   :load-path "lisp/"
   :if (eq system-type 'windows-nt))
 
-
-;; 100 MB
-(setq large-file-warning-threshold (* 100 1000 1000))
-
-(desktop-save-mode 1)
-
-;; recent files
-(setq recentf-max-saved-items 256
-      recentf-max-menu-items 16)
-(recentf-mode)
-
-;; set auto revert of buffers if file is changed externally
-(global-auto-revert-mode)
-
 ;; Solarized
 ;; https://github.com/sellout/emacs-color-theme-solarized/pull/187
 (setq color-themes '())
 (use-package color-theme-solarized
   :config
-  (customize-set-variable 'frame-background-mode 'dark)
-  (load-theme 'solarized t))
+  (load-theme 'solarized t)
+  :init
+  (add-hook 'after-make-frame-functions
+      (lambda (frame)
+        (let ((mode (if (display-graphic-p frame) 'light 'dark))
+              (set-frame-parameter frame 'background-mode mode)
+              (set-terminal-parameter frame 'background-mode mode))
+          (enable-theme 'solarized)))))
 
 ;; This can set the theme light if using windows and dark if in terminal
-;; (add-hook 'after-make-frame-functions
-;;           (lambda (frame)
-;;             (let ((mode (if (display-graphic-p frame) 'light 'dark)))
-;;               (set-frame-parameter frame 'background-mode mode)
-;;               (set-terminal-parameter frame 'background-mode mode))
-;;             (enable-theme 'solarized)))
 
 ;; https://github.com/purcell/exec-path-from-shell
 ;;(when (memq window-system '(mac ns x))
@@ -92,6 +93,9 @@
 ;; save kill ring
 (use-package savekill)
 
+;; tabs are truly evil
+(setq-default indent-tabs-mode nil)
+
 ;; fortune
 (setq inhibit-startup-screen t)
 (use-package fortune-cookie
@@ -103,7 +107,6 @@
 
 ;; http://www.flycheck.org/
 (use-package flycheck
-  :ensure t
   :init (global-flycheck-mode))
 
 ;; company "complete anything" https://github.com/andschwa/.emacs.d/blob/master/init.el
@@ -118,7 +121,6 @@
 
 ;; https://github.com/jyp/dante
 (use-package dante
-  :ensure t
   :after haskell-mode
   :commands 'dante-mode
   :init
@@ -145,20 +147,22 @@
 (use-package magit
   :bind ("C-x g" . magit-status))
 
+;; paredit for parinfer
+(use-package paredit)
+
 (use-package parinfer
-  :ensure t
   :bind
   (("C-," . parinfer-toggle-mode))
   :init
   (progn
     (setq parinfer-extensions
-          '(defaults       ; should be included.
-            pretty-parens  ; different paren styles for different modes.
-            ;;evil           ; If you use Evil.
-            ;;lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
-            paredit        ; Introduce some paredit commands.
-            smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
-            smart-yank))   ; Yank behavior depend on mode.
+     '(defaults       ; should be included.
+       pretty-parens  ; different paren styles for different modes.
+       ;;evil           ; If you use Evil.
+       ;;lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
+       paredit        ; Introduce some paredit commands.
+       smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+       smart-yank))   ; Yank behavior depend on mode.
     (add-hook 'clojure-mode-hook #'parinfer-mode)
     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
     (add-hook 'common-lisp-mode-hook #'parinfer-mode)
@@ -173,8 +177,13 @@
  '(frame-background-mode (quote dark))
  '(package-selected-packages
    (quote
-    (parinfer magit fortune-cookie savekill company dante flycheck use-package f color-theme-solarized))))
+    (paredit parinfer magit fortune-cookie savekill company dante flycheck use-package f color-theme-solarized))))
 (custom-set-faces)
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ 
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
